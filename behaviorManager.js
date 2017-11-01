@@ -4,13 +4,12 @@ const behaviorManager = function (dispatcher) {
 
 	// Returns a getter for behaviors on a given platform (use for nested behaviors)
 	const behaviorPool = (platform, state, action, callingBehavior) => behaviorName => {
-		// if (currentBehavior === behaviorName) {
-		// 	return () => console.log('Cannot')
+		platform = Object.assign({}, platform);
+		delete platform[callingBehavior];
 
-		// }
-		if (platforms[platform][behaviorName]) {
-			let behavior = platforms[platform][behaviorName];
-			return () => behavior(state, action, behaviorPool(platform, state, action));
+		if (platform[behaviorName]) {
+			let behavior = platform[behaviorName];
+			return () => behavior(state, action, behaviorPool(platform, state, action, behaviorName));
 		} else {
 			return () => console.log('Behavior not found');
 		}
@@ -20,7 +19,7 @@ const behaviorManager = function (dispatcher) {
 	const wrapBehavior = (platform, behaviorName, behavior) => {
 		return function (state, action) {
 			console.log('Platform:', platform, 'Behavior:', behaviorName, 'Trigger:', action.type);
-			return behavior(state, action, behaviorPool(platform, state, action));
+			return behavior(state, action, behaviorPool(platforms[platform], state, action, behaviorName));
 		}
 	}
 

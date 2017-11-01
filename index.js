@@ -11,7 +11,7 @@ store.register('adobe', 'my_behavior', (state, action, behaviorPool) => {
 	console.log(state);
 	console.log(action);
 
-	// behaviorPool('cart_add')();
+	behaviorPool('cart_add')();
 });
 
 // Adding the fourth parameter links this behavior to a state change:
