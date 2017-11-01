@@ -1,3 +1,4 @@
-const store = require('./store');
+const { store } = require('./store');
+const { cartAddItem } = require('./actions');
 
-console.log(store);
+store.dispatch(cartAddItem('test'));
