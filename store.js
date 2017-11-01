@@ -1,12 +1,10 @@
-const { createStore } = require('redux');
+const { createStore, applyMiddleware } = require('redux');
 const { reducer } = require('./reducers');
-const store = createStore(reducer);
-
-store.subscribe(() => {
-	// Map state to respective analytics platforms
-	console.log(store.getState());
-});
+const dispatcher = require('./dispatcher');
+const { register } = require('./behaviorManager')(dispatcher);
+const store = createStore(reducer, applyMiddleware(dispatcher.middleware));
 
 module.exports = {
-	store
+	register,
+	dispatch: store.dispatch
 };
