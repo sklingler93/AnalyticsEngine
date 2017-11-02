@@ -1,39 +1,40 @@
-const store = require('./store');
-const { CART } = require('./actionTypes');
-const { cartAddItem } = require('./actions');
+const analyticsEngine = function (dispatchRegister) {
 
+	const platforms = {};
 
+	// Returns a getter for behaviors on a given platform (use for nested behaviors)
+	const behaviorPool = (platform, state, action) => behaviorName => {
+		if (platform[behaviorName]) {
+			let behavior = platform[behaviorName];
+			return () => behavior(state, action, behaviorPool(platform, state, action));
+		} else {
+			return () => console.log('Behavior not found');
+		}
+	}
 
-// We register our behaviors like so:
-store.register('adobe', 'my_behavior', (state, action, behaviorPool) => {
-	console.log('My first behavior - Yay');
+	// Pass the behavior pool into the behavior and log details
+	const wrapBehavior = (platform, behaviorName, behavior) => {
+		return function (state, action) {
+			console.log('Platform:', platform, 'Behavior:', behaviorName, 'Trigger:', action.type);
+			return behavior(state, action, behaviorPool(platforms[platform], state, action));
+		}
+	}
 
-	console.log(state);
-	console.log(action);
+	// Action type is optional, will link the behavior to a state change
+	const register = (platform, behaviorName, behavior, actionType) => {
+		behavior = wrapBehavior(platform, behaviorName, behavior);
 
-	behaviorPool('cart_add')();
-});
+		platforms[platform] = platforms[platform] || {};
+		platforms[platform][behaviorName] = behavior;
 
-// Adding the fourth parameter links this behavior to a state change:
-store.register('adobe', 'cart_add', (state, action, behaviorPool) => {
+		if (actionType) {
+			dispatchRegister(actionType, behavior);
+		}
+	}
 
-	// In here, we have access to the state of the digital data layer, 
-	// the action itself,
-	// and the behavior pool for the current platform
+	return {
+		register
+	}
+};
 
-	console.log(state);
-	console.log(action);
-
-	// Existing behaviors can be triggered like so:
-	behaviorPool('my_behavior')();
-
-	// Non existing behaviors will log:
-	behaviorPool('non_existent')();
-
-}, CART.ADD);
-
-store.register('google', 'card_add', () => {
-	console.log('google fired');
-}, CART.ADD);
-
-store.dispatch(cartAddItem('test'));
+module.exports = analyticsEngine;

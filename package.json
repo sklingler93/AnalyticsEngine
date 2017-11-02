@@ -4,6 +4,7 @@
   "description": "A platform-agnostic, behavior driven analytics interface",
   "main": "index.js",
   "dependencies": {
+    "digital-data-store": "^1.0.1",
     "redux": "^3.7.2"
   },
   "devDependencies": {},
