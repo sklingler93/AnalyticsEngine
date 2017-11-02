@@ -1,6 +1,5 @@
 const store = require('digital-data-store');
-const { CART } = store.actionTypes;
-const { cartAddItem } = store.actions;
+const { CART } = store.actions;
 const ae = require('./index')(store.register);
 
 // We register our behaviors like so:
@@ -32,4 +31,4 @@ ae.register('google', 'card_add', () => {
 	console.log('google fired');
 }, CART.ADD);
 
-store.dispatch(cartAddItem('test'));
+store.dispatch(CART.ADD, 'test');
